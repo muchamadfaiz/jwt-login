@@ -3,7 +3,12 @@ const app = express();
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const cookieParser = require('cookie-parser')
 
+// Set cookie-parser middleware
+// digunakan saat server ingin memproses cookie dari client
+// kalau dari sisi server ga pengaruh
+app.use(cookieParser());
 
 // Simulasi hasil dari metode 'findByPk' -> sebuah instance dari model tersebut yg merepresentasikan baris pengguna dari database
 const data = {
@@ -38,6 +43,13 @@ router.post('/login', (req, res) => {
         }, process.env.ACCESS_TOKEN_SECRET, {
             expiresIn: '50s'
         }) //jwt.sign(payload, secretkey, option)
+
+        // Setting JWT Token inside cookies
+        res.cookie(
+            'accessToken', token, {
+            httpOnly: true,
+        }); //res.cookie(key, value, option)
+
         res.status(200).json({
             status: 200,
             message: 'Login Successfull',
