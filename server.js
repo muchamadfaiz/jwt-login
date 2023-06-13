@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 
@@ -30,6 +31,13 @@ router.post('/login', (req, res) => {
     const user = data.users.find(user => user.email === email && user.password === password)
 
     if (user) {
+        // Creating JWT Token
+        const token = jwt.sign({
+            userId: user.id,
+            userEmail: user.email
+        }, process.env.ACCESS_TOKEN_SECRET, {
+            expiresIn: '50s'
+        }) //jwt.sign(payload, secretkey, option)
         res.status(200).json({
             status: 200,
             message: 'Login Successfull',
@@ -38,7 +46,8 @@ router.post('/login', (req, res) => {
                 email: user.email,
                 createdAt: user.createdAt,
                 updatedAt: user.updatedAt
-            }
+            },
+            token // sending token to client
         });
     } else {
         res.status(400).json({
